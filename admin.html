@@ -704,16 +704,8 @@
         let adminPanel;
         document.addEventListener('DOMContentLoaded', () => {
             adminPanel = new AdminPanel();
-        });
 
-        <div class="form-group">
-    <label for="product-image">Upload Image</label>
-    <input type="file" id="product-image" accept="image/*" required>
-    <div id="image-preview" style="margin-top: 10px;"></div>
-</div>
-
-<script>
-document.getElementById('product-image').addEventListener('change', function(event) {
+      document.getElementById('product-image').addEventListener('change', function(event) {
     const file = event.target.files[0];
     const preview = document.getElementById('image-preview');
     
@@ -728,6 +720,9 @@ document.getElementById('product-image').addEventListener('change', function(eve
     } else {
         preview.innerHTML = '';
     }
+
+
+
 });
     </script>
 </body>
