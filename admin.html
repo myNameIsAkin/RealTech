@@ -1,32 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE
+html >
+  <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - RealTech</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
+        * {\
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
+        body {\
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
             background: #f8f9fa;
         }
 
-        .container {
+        .container {\
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
         /* Header Styles */
-        .header {
+        .header {\
             background: #fff;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: fixed;
@@ -35,11 +36,11 @@
             z-index: 1000;
         }
 
-        .navbar {
+        .navbar {\
             padding: 1rem 0;
         }
 
-        .nav-container {
+        .nav-container {\
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -48,7 +49,7 @@
             padding: 0 20px;
         }
 
-        .logo {
+        .logo {\
             display: flex;
             align-items: center;
             font-size: 1.5rem;
@@ -56,42 +57,42 @@
             color: #2c3e50;
         }
 
-        .logo i {
+        .logo i {\
             margin-right: 0.5rem;
             color: #3498db;
         }
 
-        .nav-menu {
+        .nav-menu {\
             display: flex;
             list-style: none;
             gap: 2rem;
         }
 
-        .nav-link {
+        .nav-link {\
             text-decoration: none;
             color: #333;
             font-weight: 500;
             transition: color 0.3s;
         }
 
-        .nav-link:hover {
+        .nav-link:hover {\
             color: #3498db;
         }
 
         /* Admin Styles */
-        .admin-main {
+        .admin-main {\
             padding-top: 100px;
             min-height: 100vh;
         }
 
-        .login-section {
+        .login-section {\
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 80vh;
         }
 
-        .login-form {
+        .login-form {\
             background: white;
             padding: 2rem;
             border-radius: 10px;
@@ -100,13 +101,13 @@
             max-width: 400px;
         }
 
-        .login-form h2 {
+        .login-form h2 {\
             text-align: center;
             margin-bottom: 1.5rem;
             color: #2c3e50;
         }
 
-        .login-form input {
+        .login-form input {\
             width: 100%;
             padding: 12px;
             margin-bottom: 1rem;
@@ -115,7 +116,7 @@
             font-size: 1rem;
         }
 
-        .login-form button {
+        .login-form button {\
             width: 100%;
             padding: 12px;
             background: #3498db;
@@ -127,26 +128,26 @@
             transition: background 0.3s;
         }
 
-        .login-form button:hover {
+        .login-form button:hover {\
             background: #2980b9;
         }
 
-        .login-hint {
+        .login-hint {\
             text-align: center;
             margin-top: 1rem;
             color: #7f8c8d;
             font-size: 0.9rem;
         }
 
-        .admin-panel {
+        .admin-panel {\
             padding: 2rem 0;
         }
 
-        .admin-actions {
+        .admin-actions {\
             margin-bottom: 2rem;
         }
 
-        .whatsapp-config {
+        .whatsapp-config {\
             background: white;
             padding: 2rem;
             border-radius: 10px;
@@ -154,12 +155,12 @@
             margin-bottom: 2rem;
         }
 
-        .whatsapp-config h3 {
+        .whatsapp-config h3 {\
             margin-bottom: 1rem;
             color: #2c3e50;
         }
 
-        .whatsapp-number-input {
+        .whatsapp-number-input {\
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -168,7 +169,7 @@
             margin-bottom: 1rem;
         }
 
-        .product-form {
+        .product-form {\
             background: white;
             padding: 2rem;
             border-radius: 10px;
@@ -176,11 +177,11 @@
             margin-bottom: 2rem;
         }
 
-        .form-group {
+        .form-group {\
             margin-bottom: 1rem;
         }
 
-        .form-group label {
+        .form-group label {\
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
@@ -189,12 +190,88 @@
 
         .form-group input,
         .form-group select,
-        .form-group textarea {
+        .form-group textarea {\
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
+        }
+
+        /* Image upload specific styles */
+        .image-upload-container {\
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        .image-upload-container:hover {\
+            border-color: #3498db;
+        }
+
+        .image-upload-container.dragover {
+            border-color: #3498db;
+            background-color: #f8f9ff;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .file-input-button:hover {
+            background: #2980b9;
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .image-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview .remove-image {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .image-preview .remove-image:hover {
+            background: #c0392b;
         }
 
         .form-actions {
@@ -228,6 +305,13 @@
             font-size: 1.5rem;
             color: #667eea;
             border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .admin-product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .admin-product-info {
@@ -385,8 +469,20 @@
                             <input type="number" id="product-price" step="0.01" required>
                         </div>
                         <div class="form-group">
-                            <label for="product-image">Image (emoji or URL)</label>
-                            <input type="text" id="product-image" placeholder="💻 or image URL" required>
+                            <label for="product-image">Product Image</label>
+                            <div class="image-upload-container" id="image-upload-container">
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="product-image" accept="image/*" required>
+                                    <div class="file-input-button">
+                                        <i class="fas fa-upload"></i>
+                                        Choose Image File
+                                    </div>
+                                </div>
+                                <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                                    Drag and drop an image here, or click to select
+                                </p>
+                                <div id="image-preview" class="image-preview"></div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="product-description">Description</label>
@@ -419,6 +515,7 @@
             constructor() {
                 this.products = this.loadProducts();
                 this.isLoggedIn = this.checkLoginStatus();
+                this.currentImageData = null;
                 this.init();
             }
 
@@ -427,6 +524,7 @@
                 this.setupProductForm();
                 this.setupLogout();
                 this.setupWhatsAppConfig();
+                this.setupImageUpload();
                 if (this.isLoggedIn) {
                     this.showAdminPanel();
                     this.displayAdminProducts();
@@ -498,6 +596,82 @@
                 // Clear form
                 const loginForm = document.getElementById('login-form');
                 if (loginForm) loginForm.reset();
+            }
+
+            setupImageUpload() {
+                const fileInput = document.getElementById('product-image');
+                const uploadContainer = document.getElementById('image-upload-container');
+                const imagePreview = document.getElementById('image-preview');
+
+                if (fileInput) {
+                    fileInput.addEventListener('change', (e) => {
+                        this.handleImageUpload(e.target.files[0]);
+                    });
+                }
+
+                if (uploadContainer) {
+                    // Drag and drop functionality
+                    uploadContainer.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        uploadContainer.classList.add('dragover');
+                    });
+
+                    uploadContainer.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        uploadContainer.classList.remove('dragover');
+                    });
+
+                    uploadContainer.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        uploadContainer.classList.remove('dragover');
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0 && files[0].type.startsWith('image/')) {
+                            this.handleImageUpload(files[0]);
+                        }
+                    });
+                }
+            }
+
+            handleImageUpload(file) {
+                if (!file || !file.type.startsWith('image/')) {
+                    alert('Please select a valid image file');
+                    return;
+                }
+
+                // Check file size (limit to 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size should be less than 5MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.currentImageData = e.target.result;
+                    this.showImagePreview(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            showImagePreview(imageSrc) {
+                const imagePreview = document.getElementById('image-preview');
+                if (imagePreview) {
+                    imagePreview.innerHTML = `
+                        <img src="${imageSrc}" alt="Product Preview">
+                        <br>
+                        <button type="button" class="remove-image" onclick="adminPanel.removeImage()">
+                            <i class="fas fa-trash"></i> Remove Image
+                        </button>
+                    `;
+                }
+            }
+
+            removeImage() {
+                this.currentImageData = null;
+                const imagePreview = document.getElementById('image-preview');
+                const fileInput = document.getElementById('product-image');
+                
+                if (imagePreview) imagePreview.innerHTML = '';
+                if (fileInput) fileInput.value = '';
             }
 
             setupProductForm() {
@@ -582,14 +756,20 @@
                 document.getElementById('product-name').value = product.name;
                 document.getElementById('product-brand').value = product.brand;
                 document.getElementById('product-price').value = product.price;
-                document.getElementById('product-image').value = product.image;
                 document.getElementById('product-description').value = product.description;
                 document.getElementById('product-specs').value = product.specs ? product.specs.join('\n') : '';
+                
+                // Handle image data
+                if (product.image) {
+                    this.currentImageData = product.image;
+                    this.showImagePreview(product.image);
+                }
             }
 
             clearForm() {
                 document.getElementById('product-form-element').reset();
                 document.getElementById('product-id').value = '';
+                this.removeImage();
             }
 
             saveProduct() {
@@ -597,16 +777,21 @@
                 const name = document.getElementById('product-name').value;
                 const brand = document.getElementById('product-brand').value;
                 const price = parseFloat(document.getElementById('product-price').value);
-                const image = document.getElementById('product-image').value;
                 const description = document.getElementById('product-description').value;
                 const specsText = document.getElementById('product-specs').value;
                 const specs = specsText.split('\n').filter(spec => spec.trim());
+
+                // Validate image
+                if (!this.currentImageData) {
+                    alert('Please select an image for the product');
+                    return;
+                }
 
                 const product = {
                     name,
                     brand,
                     price,
-                    image,
+                    image: this.currentImageData, // Store base64 image data
                     description,
                     specs
                 };
@@ -615,7 +800,7 @@
                     // Edit existing product
                     const index = this.products.findIndex(p => p.id == id);
                     if (index !== -1) {
-                        product.id = parseInt(id);
+                        product.id = Number.parseInt(id);
                         this.products[index] = product;
                     }
                 } else {
@@ -644,8 +829,14 @@
                 this.products.forEach(product => {
                     const productItem = document.createElement('div');
                     productItem.className = 'admin-product-item';
+                    
+                    // Handle image display - check if it's base64 data or emoji/text
+                    const imageContent = product.image.startsWith('data:image/') 
+                        ? `<img src="${product.image}" alt="${product.name}">`
+                        : product.image;
+                    
                     productItem.innerHTML = `
-                        <div class="admin-product-image">${product.image}</div>
+                        <div class="admin-product-image">${imageContent}</div>
                         <div class="admin-product-info">
                             <h4>${product.name}</h4>
                             <p>${product.brand} - $${product.price.toFixed(2)}</p>
