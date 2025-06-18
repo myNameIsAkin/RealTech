@@ -425,10 +425,10 @@
                 </select>
                 <select id="price-filter">
                     <option value="">All Prices</option>
-                    <option value="0-1000">Under $1,000</option>
-                    <option value="1000-2000">$1,000 - $2,000</option>
-                    <option value="2000-3000">$2,000 - $3,000</option>
-                    <option value="3000+">$3,000+</option>
+                    <option value="0-1000">Under #100,000</option>
+                    <option value="1000-2000">#100,000 - #200,000</option>
+                    <option value="2000-3000">#200,000 - #300,000</option>
+                    <option value="3000+">#300,000+</option>
                 </select>
             </div>
             <div id="products-grid" class="products-grid">
@@ -693,7 +693,7 @@
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <p class="product-brand">${product.brand}</p>
-                        <p class="product-price">$${product.price.toFixed(2)}</p>
+                        <p class="product-price">#${product.price.toFixed(2)}</p>
                         <p class="product-description">${product.description}</p>
                         <button class="btn btn-primary" onclick="productManager.addToCart(${product.id})" id="btn-${product.id}">
                             <i class="fas fa-cart-plus"></i> Add to Cart
