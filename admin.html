@@ -335,7 +335,7 @@
                     <input type="password" id="password" placeholder="Password" required>
                     <button type="submit">Login</button>
                 </form>
-                <p class="login-hint">Hint: admin / admin123</p>
+                <p class="login-hint"></p>
             </div>
         </div>
 
@@ -381,13 +381,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="product-price">Price ($)</label>
+                            <label for="product-price">Price (#)</label>
                             <input type="number" id="product-price" step="0.01" required>
                         </div>
                         <div class="form-group">
-                            <label for="product-image">Image (emoji or URL)</label>
-                            <input type="text" id="product-image" placeholder="💻 or image URL" required>
-                        </div>
+    <label for="product-image">Upload Image</label>
+    <input type="file" id="product-image" accept="image/*" required>
+</div>
+                       
                         <div class="form-group">
                             <label for="product-description">Description</label>
                             <textarea id="product-description" rows="4" required></textarea>
