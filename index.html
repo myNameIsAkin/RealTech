@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RealTech - Premium Laptops Store</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<!-- Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     * {
         margin: 0;
@@ -80,20 +78,6 @@
         color: #3498db;
     }
 
-    .hamburger {
-        display: none;
-        flex-direction: column;
-        cursor: pointer;
-    }
-
-    .hamburger span {
-        width: 25px;
-        height: 3px;
-        background: #333;
-        margin: 3px 0;
-        transition: 0.3s;
-    }
-
     /* Hero Section */
     .hero {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -159,7 +143,6 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 2rem;
-        min-height: 200px;
     }
 
     .product-card {
@@ -249,41 +232,6 @@
         cursor: not-allowed;
     }
 
-    /* Loading states */
-    .loading-grid {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 300px;
-    }
-
-    .loading {
-        display: inline-block;
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .no-products {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #7f8c8d;
-    }
-
-    .no-products i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        color: #bdc3c7;
-    }
-
     /* WhatsApp floating button */
     .whatsapp-float {
         position: fixed;
@@ -319,39 +267,6 @@
         padding: 2rem 0;
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .hamburger {
-            display: flex;
-        }
-        
-        .nav-menu {
-            position: fixed;
-            left: -100%;
-            top: 70px;
-            flex-direction: column;
-            background-color: white;
-            width: 100%;
-            text-align: center;
-            transition: 0.3s;
-            box-shadow: 0 10px 27px rgba(0,0,0,0.05);
-            padding: 2rem 0;
-        }
-        
-        .nav-menu.active {
-            left: 0;
-        }
-        
-        .hero-content h1 {
-            font-size: 2rem;
-        }
-        
-        .filters {
-            flex-direction: column;
-            align-items: center;
-        }
-    }
-
     /* Notification styles */
     .notification {
         position: fixed;
@@ -374,6 +289,18 @@
     .notification.error {
         background: #e74c3c;
     }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+        
+        .filters {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
 </style>
 </head>
 <body>
@@ -393,11 +320,6 @@
                 </a></li>
                 <li><a href="admin.html" class="nav-link">Admin</a></li>
             </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
         </div>
     </nav>
 </header>
@@ -425,16 +347,14 @@
                 </select>
                 <select id="price-filter">
                     <option value="">All Prices</option>
-                    <option value="0-1000">Under #100,000</option>
-                    <option value="1000-2000">#100,000 - #200,000</option>
-                    <option value="2000-3000">#200,000 - #300,000</option>
-                    <option value="3000+">#300,000+</option>
+                    <option value="0-1000">Under $1,000</option>
+                    <option value="1000-2000">$1,000 - $2,000</option>
+                    <option value="2000-3000">$2,000 - $3,000</option>
+                    <option value="3000+">$3,000+</option>
                 </select>
             </div>
             <div id="products-grid" class="products-grid">
-                <div class="loading-grid">
-                    <div class="loading"></div>
-                </div>
+                <!-- Products will be loaded here -->
             </div>
         </div>
     </section>
@@ -452,68 +372,27 @@
 </a>
 
 <script>
-    // Supabase configuration - REPLACE WITH YOUR CREDENTIALS
-    const SUPABASE_URL = 'https://tpndsgimmvkbmfbfcrzx.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwbmRzZ2ltbXZrYm1mYmZjcnp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyNDg4NzEsImV4cCI6MjA2NTgyNDg3MX0.C0nIeEjmQnUXPh1C4QELS-5t8vYjuXsQLnQcuFcalhw'
-    
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-    // Product management and main store functionality with Supabase
+    // Simple, fast product manager using localStorage
     class ProductManager {
         constructor() {
-            this.products = [];
-            this.cart = [];
-            this.sessionId = this.getSessionId();
-            this.whatsappNumber = null;
+            this.products = this.getDefaultProducts();
+            this.cart = this.loadCart();
+            this.whatsappNumber = localStorage.getItem('whatsapp_number') || '1234567890';
             this.init();
         }
 
-        getSessionId() {
-            // Get or create a session ID for guest users
-            let sessionId = localStorage.getItem('cartSessionId');
-            if (!sessionId) {
-                sessionId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('cartSessionId', sessionId);
-            }
-            return sessionId;
-        }
-
-        async init() {
-            await this.loadProducts();
-            await this.loadWhatsAppNumber();
-            await this.loadCartCount();
+        init() {
+            this.displayProducts();
             this.setupFilters();
-            this.setupMobileMenu();
+            this.updateCartCount();
             this.setupWhatsAppFloat();
-            this.setupRealTimeUpdates();
+            this.loadStoredProducts();
         }
 
-        async loadProducts() {
-            try {
-                const { data, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-                
-                this.products = data || [];
-                
-                // If no products in database, load default products
-                if (this.products.length === 0) {
-                    await this.loadDefaultProducts();
-                } else {
-                    this.displayProducts();
-                }
-            } catch (error) {
-                console.error('Error loading products:', error);
-                this.showError('Failed to load products. Please refresh the page.');
-            }
-        }
-
-        async loadDefaultProducts() {
-            const defaultProducts = [
+        getDefaultProducts() {
+            return [
                 {
+                    id: 1,
                     name: "MacBook Pro 16-inch",
                     brand: "Apple",
                     price: 2499.99,
@@ -522,6 +401,7 @@
                     specs: ["Apple M2 Pro chip", "16GB RAM", "512GB SSD", "16-inch Retina display"]
                 },
                 {
+                    id: 2,
                     name: "Dell XPS 13",
                     brand: "Dell",
                     price: 1299.99,
@@ -530,6 +410,7 @@
                     specs: ["Intel i7-1260P", "16GB RAM", "512GB SSD", "13.4-inch FHD+ display"]
                 },
                 {
+                    id: 3,
                     name: "HP Spectre x360",
                     brand: "HP",
                     price: 1199.99,
@@ -538,6 +419,7 @@
                     specs: ["Intel i7-1255U", "16GB RAM", "512GB SSD", "13.5-inch OLED touchscreen"]
                 },
                 {
+                    id: 4,
                     name: "ThinkPad X1 Carbon",
                     brand: "Lenovo",
                     price: 1599.99,
@@ -546,6 +428,7 @@
                     specs: ["Intel i7-1260P", "16GB RAM", "1TB SSD", "14-inch WUXGA display"]
                 },
                 {
+                    id: 5,
                     name: "ASUS ROG Zephyrus G14",
                     brand: "ASUS",
                     price: 1899.99,
@@ -554,6 +437,7 @@
                     specs: ["AMD Ryzen 9 6900HS", "32GB RAM", "1TB SSD", "RTX 3060 GPU"]
                 },
                 {
+                    id: 6,
                     name: "MacBook Air M2",
                     brand: "Apple",
                     price: 1199.99,
@@ -562,104 +446,32 @@
                     specs: ["Apple M2 chip", "8GB RAM", "256GB SSD", "13.6-inch Liquid Retina display"]
                 }
             ];
-
-            try {
-                const { data, error } = await supabase
-                    .from('products')
-                    .insert(defaultProducts)
-                    .select();
-
-                if (error) throw error;
-                
-                this.products = data || [];
-                this.displayProducts();
-            } catch (error) {
-                console.error('Error loading default products:', error);
-                this.showError('Failed to initialize products.');
-            }
         }
 
-        async loadWhatsAppNumber() {
-            try {
-                const { data, error } = await supabase
-                    .from('settings')
-                    .select('value')
-                    .eq('key', 'whatsapp_number')
-                    .single();
-
-                if (data) {
-                    this.whatsappNumber = data.value;
+        loadStoredProducts() {
+            // Load products from localStorage if they exist (from admin panel)
+            const storedProducts = localStorage.getItem('laptopProducts');
+            if (storedProducts) {
+                try {
+                    const parsed = JSON.parse(storedProducts);
+                    if (parsed.length > 0) {
+                        this.products = parsed;
+                        this.displayProducts();
+                    }
+                } catch (error) {
+                    console.error('Error loading stored products:', error);
                 }
-            } catch (error) {
-                console.error('Error loading WhatsApp number:', error);
-                // Use default if not found
-                this.whatsappNumber = '1234567890';
             }
         }
 
-        async loadCartCount() {
-            try {
-                const { data, error } = await supabase
-                    .from('cart_items')
-                    .select('quantity')
-                    .eq('session_id', this.sessionId);
-
-                if (error) throw error;
-
-                const totalItems = data.reduce((sum, item) => sum + item.quantity, 0);
-                this.updateCartCount(totalItems);
-            } catch (error) {
-                console.error('Error loading cart count:', error);
-                // Fallback to localStorage
-                const cart = localStorage.getItem('laptopCart');
-                const localCart = cart ? JSON.parse(cart) : [];
-                const totalItems = localCart.reduce((sum, item) => sum + item.quantity, 0);
-                this.updateCartCount(totalItems);
-            }
+        loadCart() {
+            const cart = localStorage.getItem('laptopCart');
+            return cart ? JSON.parse(cart) : [];
         }
 
-        setupRealTimeUpdates() {
-            // Listen for real-time changes to products
-            supabase
-                .channel('products')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'products' }, 
-                    (payload) => {
-                        console.log('Product change detected:', payload);
-                        this.loadProducts(); // Reload products when changes occur
-                    }
-                )
-                .subscribe();
-
-            // Listen for cart changes
-            supabase
-                .channel('cart_items')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'cart_items',
-                        filter: `session_id=eq.${this.sessionId}`
-                    }, 
-                    (payload) => {
-                        console.log('Cart change detected:', payload);
-                        this.loadCartCount(); // Update cart count when changes occur
-                    }
-                )
-                .subscribe();
-
-            // Listen for settings changes (WhatsApp number)
-            supabase
-                .channel('settings')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'settings' }, 
-                    (payload) => {
-                        if (payload.new?.key === 'whatsapp_number') {
-                            this.whatsappNumber = payload.new.value;
-                        }
-                    }
-                )
-                .subscribe();
+        saveCart() {
+            localStorage.setItem('laptopCart', JSON.stringify(this.cart));
+            this.updateCartCount();
         }
 
         displayProducts(productsToShow = this.products) {
@@ -670,8 +482,8 @@
 
             if (productsToShow.length === 0) {
                 grid.innerHTML = `
-                    <div class="no-products">
-                        <i class="fas fa-laptop"></i>
+                    <div style="text-align: center; padding: 4rem 2rem; color: #7f8c8d; grid-column: 1 / -1;">
+                        <i class="fas fa-laptop" style="font-size: 4rem; margin-bottom: 1rem; color: #bdc3c7;"></i>
                         <h3>No products found</h3>
                         <p>Try adjusting your filters or check back later.</p>
                     </div>
@@ -693,7 +505,7 @@
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <p class="product-brand">${product.brand}</p>
-                        <p class="product-price">#${product.price.toFixed(2)}</p>
+                        <p class="product-price">$${product.price.toFixed(2)}</p>
                         <p class="product-description">${product.description}</p>
                         <button class="btn btn-primary" onclick="productManager.addToCart(${product.id})" id="btn-${product.id}">
                             <i class="fas fa-cart-plus"></i> Add to Cart
@@ -740,7 +552,7 @@
             this.displayProducts(filteredProducts);
         }
 
-        async addToCart(productId) {
+        addToCart(productId) {
             const product = this.products.find(p => p.id === productId);
             if (!product) return;
 
@@ -751,84 +563,30 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
             }
 
-            try {
-                // Check if item already exists in cart
-                const { data: existingItem, error: checkError } = await supabase
-                    .from('cart_items')
-                    .select('*')
-                    .eq('product_id', productId)
-                    .eq('session_id', this.sessionId)
-                    .single();
-
-                if (existingItem) {
-                    // Update quantity
-                    const { error: updateError } = await supabase
-                        .from('cart_items')
-                        .update({ quantity: existingItem.quantity + 1 })
-                        .eq('id', existingItem.id);
-
-                    if (updateError) throw updateError;
-                } else {
-                    // Insert new item
-                    const { error: insertError } = await supabase
-                        .from('cart_items')
-                        .insert([{
-                            product_id: productId,
-                            quantity: 1,
-                            session_id: this.sessionId
-                        }]);
-
-                    if (insertError) throw insertError;
-                }
-
-                this.showNotification(`${product.name} added to cart!`);
-                // Cart count will be updated via real-time subscription
-
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                this.showNotification('Error adding to cart. Please try again.', 'error');
-                
-                // Fallback to localStorage
-                const cart = localStorage.getItem('laptopCart');
-                const localCart = cart ? JSON.parse(cart) : [];
-                const existingItem = localCart.find(item => item.id === productId);
-                
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    localCart.push({ ...product, quantity: 1 });
-                }
-                
-                localStorage.setItem('laptopCart', JSON.stringify(localCart));
-                const totalItems = localCart.reduce((sum, item) => sum + item.quantity, 0);
-                this.updateCartCount(totalItems);
-                this.showNotification(`${product.name} added to cart!`);
-            } finally {
-                // Re-enable button
-                setTimeout(() => {
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
-                    }
-                }, 1000);
+            const existingItem = this.cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                this.cart.push({ ...product, quantity: 1 });
             }
+
+            this.saveCart();
+            this.showNotification(`${product.name} added to cart!`);
+
+            // Re-enable button
+            setTimeout(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                }
+            }, 1000);
         }
 
-        updateCartCount(count) {
+        updateCartCount() {
             const cartCount = document.getElementById('cart-count');
             if (cartCount) {
-                cartCount.textContent = count || 0;
-            }
-        }
-
-        setupMobileMenu() {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.querySelector('.nav-menu');
-
-            if (hamburger && navMenu) {
-                hamburger.addEventListener('click', () => {
-                    navMenu.classList.toggle('active');
-                });
+                const totalItems = this.cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCount.textContent = totalItems;
             }
         }
 
@@ -861,31 +619,23 @@
                 }, 300);
             }, 3000);
         }
-
-        showError(message) {
-            this.showNotification(message, 'error');
-            
-            // Show error state in products grid
-            const grid = document.getElementById('products-grid');
-            if (grid) {
-                grid.innerHTML = `
-                    <div class="no-products">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error Loading Products</h3>
-                        <p>${message}</p>
-                        <button class="btn btn-primary" onclick="location.reload()">
-                            <i class="fas fa-refresh"></i> Retry
-                        </button>
-                    </div>
-                `;
-            }
-        }
     }
 
     // Initialize the product manager when the page loads
     let productManager;
     document.addEventListener('DOMContentLoaded', () => {
         productManager = new ProductManager();
+    });
+
+    // Listen for storage changes to update products from admin panel
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'laptopProducts') {
+            productManager.loadStoredProducts();
+        }
+        if (e.key === 'laptopCart') {
+            productManager.cart = productManager.loadCart();
+            productManager.updateCartCount();
+        }
     });
 </script>
 </body>
