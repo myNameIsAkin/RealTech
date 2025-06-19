@@ -143,6 +143,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 2rem;
+        min-height: 200px;
     }
 
     .product-card {
@@ -232,6 +233,42 @@
         cursor: not-allowed;
     }
 
+    /* Loading states */
+    .loading-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .loading {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .no-products {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #7f8c8d;
+        grid-column: 1 / -1;
+    }
+
+    .no-products i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #bdc3c7;
+    }
+
     /* WhatsApp floating button */
     .whatsapp-float {
         position: fixed;
@@ -318,7 +355,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     Cart (<span id="cart-count">0</span>)
                 </a></li>
-                <li><a href="admin.html" class="nav-link">Admin</a></li>
+                <li><a href="admin-panel.html" class="nav-link">Admin</a></li>
             </ul>
         </div>
     </nav>
@@ -354,7 +391,9 @@
                 </select>
             </div>
             <div id="products-grid" class="products-grid">
-                <!-- Products will be loaded here -->
+                <div class="loading-grid">
+                    <div class="loading"></div>
+                </div>
             </div>
         </div>
     </section>
@@ -372,21 +411,78 @@
 </a>
 
 <script>
-    // Simple, fast product manager using localStorage
+    // Shared database configuration
+    const DB_CONFIG = {
+        // You'll need to create a free account at jsonbin.io and get these
+        BIN_ID: '6853e8a18960c979a5acbf7d', // Replace with your JSONBin ID
+        API_KEY: '$2a$10$cv7nlzyC.riYJ6wqTQdWLeM5kw0eYApifuJtFY6F1TnOD7Za73HKy', // Replace with your JSONBin API key
+        BASE_URL: 'https://api.jsonbin.io/v3/b/6853e8a18960c979a5acbf7d'
+    };
+
+    // Product manager with shared database
     class ProductManager {
         constructor() {
-            this.products = this.getDefaultProducts();
+            this.products = [];
             this.cart = this.loadCart();
-            this.whatsappNumber = localStorage.getItem('whatsapp_number') || '1234567890';
+            this.whatsappNumber = '1234567890';
             this.init();
         }
 
-        init() {
-            this.displayProducts();
+        async init() {
+            await this.loadProducts();
+            await this.loadSettings();
             this.setupFilters();
             this.updateCartCount();
             this.setupWhatsAppFloat();
-            this.loadStoredProducts();
+            this.startPolling(); // Check for updates every 30 seconds
+        }
+
+        async loadProducts() {
+            try {
+                // Try to load from shared database first
+                const response = await fetch(`${DB_CONFIG.BASE_URL}/${DB_CONFIG.BIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': DB_CONFIG.API_KEY
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.products = data.record.products || this.getDefaultProducts();
+                    this.whatsappNumber = data.record.whatsapp_number || '1234567890';
+                } else {
+                    throw new Error('Failed to load from database');
+                }
+            } catch (error) {
+                console.log('Loading from database failed, using defaults:', error);
+                // Fallback to default products
+                this.products = this.getDefaultProducts();
+                // Try to initialize the database with default data
+                await this.initializeDatabase();
+            }
+            
+            this.displayProducts();
+        }
+
+        async initializeDatabase() {
+            try {
+                const defaultData = {
+                    products: this.getDefaultProducts(),
+                    whatsapp_number: '1234567890',
+                    last_updated: new Date().toISOString()
+                };
+
+                await fetch(`${DB_CONFIG.BASE_URL}/${DB_CONFIG.BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': DB_CONFIG.API_KEY
+                    },
+                    body: JSON.stringify(defaultData)
+                });
+            } catch (error) {
+                console.error('Failed to initialize database:', error);
+            }
         }
 
         getDefaultProducts() {
@@ -448,20 +544,15 @@
             ];
         }
 
-        loadStoredProducts() {
-            // Load products from localStorage if they exist (from admin panel)
-            const storedProducts = localStorage.getItem('laptopProducts');
-            if (storedProducts) {
-                try {
-                    const parsed = JSON.parse(storedProducts);
-                    if (parsed.length > 0) {
-                        this.products = parsed;
-                        this.displayProducts();
-                    }
-                } catch (error) {
-                    console.error('Error loading stored products:', error);
-                }
-            }
+        async loadSettings() {
+            // Settings are loaded with products
+        }
+
+        startPolling() {
+            // Check for updates every 30 seconds
+            setInterval(async () => {
+                await this.loadProducts();
+            }, 30000);
         }
 
         loadCart() {
@@ -482,8 +573,8 @@
 
             if (productsToShow.length === 0) {
                 grid.innerHTML = `
-                    <div style="text-align: center; padding: 4rem 2rem; color: #7f8c8d; grid-column: 1 / -1;">
-                        <i class="fas fa-laptop" style="font-size: 4rem; margin-bottom: 1rem; color: #bdc3c7;"></i>
+                    <div class="no-products">
+                        <i class="fas fa-laptop"></i>
                         <h3>No products found</h3>
                         <p>Try adjusting your filters or check back later.</p>
                     </div>
@@ -625,17 +716,6 @@
     let productManager;
     document.addEventListener('DOMContentLoaded', () => {
         productManager = new ProductManager();
-    });
-
-    // Listen for storage changes to update products from admin panel
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'laptopProducts') {
-            productManager.loadStoredProducts();
-        }
-        if (e.key === 'laptopCart') {
-            productManager.cart = productManager.loadCart();
-            productManager.updateCartCount();
-        }
     });
 </script>
 </body>
