@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - RealTech</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -24,10 +22,9 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px;
         }
 
-        /* Header Styles */
         .header {
             background: #fff;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -80,7 +77,6 @@
             color: #3498db;
         }
 
-        /* Admin Styles */
         .admin-main {
             padding-top: 100px;
             min-height: 100vh;
@@ -144,10 +140,6 @@
             padding: 2rem 0;
         }
 
-        .admin-actions {
-            margin-bottom: 2rem;
-        }
-
         .whatsapp-config {
             background: white;
             padding: 2rem;
@@ -199,7 +191,6 @@
             font-size: 1rem;
         }
 
-        /* Image upload specific styles */
         .image-upload-container {
             border: 2px dashed #ddd;
             border-radius: 8px;
@@ -210,11 +201,6 @@
 
         .image-upload-container:hover {
             border-color: #3498db;
-        }
-
-        .image-upload-container.dragover {
-            border-color: #3498db;
-            background-color: #f8f9ff;
         }
 
         .file-input-wrapper {
@@ -259,26 +245,43 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .image-preview .remove-image {
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            text-decoration: none;
             display: inline-block;
-            margin-top: 10px;
-            padding: 5px 15px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-danger {
             background: #e74c3c;
             color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.9rem;
         }
 
-        .image-preview .remove-image:hover {
+        .btn-danger:hover {
             background: #c0392b;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
         }
 
         .products-table {
@@ -324,74 +327,12 @@
             gap: 0.5rem;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        /* Loading spinner */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .admin-product-item {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-
-        /* Notification styles */
         .notification {
             position: fixed;
             top: 100px;
@@ -416,570 +357,341 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="logo">
-                    <i class="fas fa-laptop"></i>
-                    <span>RealTech Admin</span>
-                </div>
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="nav-link">Back to Store</a></li>
-                    <li><a href="#" id="logout-btn" class="nav-link">Logout</a></li>
-                </ul>
+<header class="header">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-laptop"></i>
+                <span>RealTech Admin</span>
             </div>
-        </nav>
-    </header>
-
-    <main class="admin-main">
-        <div id="login-section" class="login-section">
-            <div class="login-form">
-                <h2>Admin Login</h2>
-                <form id="login-form">
-                    <input type="text" id="username" placeholder="Username" required>
-                    <input type="password" id="password" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                </form>
-                <p class="login-hint"></p>
-            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Back to Store</a></li>
+                <li><a href="#" id="logout-btn" class="nav-link">Logout</a></li>
+            </ul>
         </div>
+    </nav>
+</header>
 
-        <div id="admin-panel" class="admin-panel" style="display: none;">
-            <div class="container">
-                <h2>Product Management</h2>
-                
-                <!-- WhatsApp Configuration -->
-                <div class="whatsapp-config">
-                    <h3><i class="fab fa-whatsapp"></i> WhatsApp Configuration</h3>
-                    <label for="whatsapp-number">WhatsApp Business Number (with country code, no + or spaces):</label>
-                    <input type="tel" id="whatsapp-number" class="whatsapp-number-input" 
-                           placeholder="e.g., 2347084256460" value="">
-                    <button id="save-whatsapp" class="btn btn-primary">Save WhatsApp Number</button>
-                    <p style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">
-                        Example: For +1 (234) 567-8900, enter: 12345678900
-                    </p>
-                </div>
+<main class="admin-main">
+    <div id="login-section" class="login-section">
+        <div class="login-form">
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p class="login-hint">Hint: admin / admin123</p>
+        </div>
+    </div>
 
-                <div class="admin-actions">
-                    <button id="add-product-btn" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add New Product
-                    </button>
-                </div>
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <div class="container">
+            <h2>Product Management</h2>
+            
+            <!-- WhatsApp Configuration -->
+            <div class="whatsapp-config">
+                <h3><i class="fab fa-whatsapp"></i> WhatsApp Configuration</h3>
+                <label for="whatsapp-number">WhatsApp Business Number (with country code, no + or spaces):</label>
+                <input type="tel" id="whatsapp-number" class="whatsapp-number-input" 
+                       placeholder="e.g., 1234567890" value="">
+                <button id="save-whatsapp" class="btn btn-primary">Save WhatsApp Number</button>
+                <p style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">
+                    Example: For +1 (234) 567-8900, enter: 12345678900
+                </p>
+            </div>
 
-                <div id="product-form" class="product-form" style="display: none;">
-                    <h3 id="form-title">Add New Product</h3>
-                    <form id="product-form-element">
-                        <input type="hidden" id="product-id">
-                        <div class="form-group">
-                            <label for="product-name">Product Name</label>
-                            <input type="text" id="product-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-brand">Brand</label>
-                            <select id="product-brand" required>
-                                <option value="">Select Brand</option>
-                                <option value="Apple">Apple</option>
-                                <option value="Dell">Dell</option>
-                                <option value="HP">HP</option>
-                                <option value="Lenovo">Lenovo</option>
-                                <option value="ASUS">ASUS</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-price">Price (#)</label>
-                            <input type="number" id="product-price" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-image">Product Image</label>
-                            <div class="image-upload-container" id="image-upload-container">
-                                <div class="file-input-wrapper">
-                                    <input type="file" id="product-image" accept="image/*" required>
-                                    <div class="file-input-button">
-                                        <i class="fas fa-upload"></i>
-                                        Choose Image File
-                                    </div>
-                                </div>
-                                <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
-                                    Drag and drop an image here, or click to select
-                                </p>
-                                <div id="image-preview" class="image-preview"></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-description">Description</label>
-                            <textarea id="product-description" rows="4" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-specs">Specifications (one per line)</label>
-                            <textarea id="product-specs" rows="6" placeholder="Processor: Intel i7&#10;RAM: 16GB&#10;Storage: 512GB SSD"></textarea>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <span class="btn-text">Save Product</span>
-                                <span class="loading" style="display: none;"></span>
-                            </button>
-                            <button type="button" id="cancel-form" class="btn btn-secondary">Cancel</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="admin-actions">
+                <button id="add-product-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+            </div>
 
-                <div class="products-table">
-                    <h3>Existing Products</h3>
-                    <div id="admin-products-list">
-                        <div class="loading" style="margin: 2rem auto;"></div>
+            <div id="product-form" class="product-form" style="display: none;">
+                <h3 id="form-title">Add New Product</h3>
+                <form id="product-form-element">
+                    <input type="hidden" id="product-id">
+                    <div class="form-group">
+                        <label for="product-name">Product Name</label>
+                        <input type="text" id="product-name" required>
                     </div>
+                    <div class="form-group">
+                        <label for="product-brand">Brand</label>
+                        <select id="product-brand" required>
+                            <option value="">Select Brand</option>
+                            <option value="Apple">Apple</option>
+                            <option value="Dell">Dell</option>
+                            <option value="HP">HP</option>
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="ASUS">ASUS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Price ($)</label>
+                        <input type="number" id="product-price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-image">Product Image</label>
+                        <div class="image-upload-container" id="image-upload-container">
+                            <div class="file-input-wrapper">
+                                <input type="file" id="product-image" accept="image/*">
+                                <div class="file-input-button">
+                                    <i class="fas fa-upload"></i>
+                                    Choose Image File
+                                </div>
+                            </div>
+                            <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                                Drag and drop an image here, or click to select
+                            </p>
+                            <div id="image-preview" class="image-preview"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Description</label>
+                        <textarea id="product-description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-specs">Specifications (one per line)</label>
+                        <textarea id="product-specs" rows="6" placeholder="Processor: Intel i7&#10;RAM: 16GB&#10;Storage: 512GB SSD"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Product</button>
+                        <button type="button" id="cancel-form" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="products-table">
+                <h3>Existing Products</h3>
+                <div id="admin-products-list">
+                    <!-- Products will be loaded here -->
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <script>
-        // Supabase configuration - REPLACE WITH YOUR CREDENTIALS
-        const SUPABASE_URL = 'https://tpndsgimmvkbmfbfcrzx.supabase.co'
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwbmRzZ2ltbXZrYm1mYmZjcnp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyNDg4NzEsImV4cCI6MjA2NTgyNDg3MX0.C0nIeEjmQnUXPh1C4QELS-5t8vYjuXsQLnQcuFcalhw'
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+<script>
+    // Simple, fast admin panel using localStorage
+    class AdminPanel {
+        constructor() {
+            this.products = this.loadProducts();
+            this.isLoggedIn = this.checkLoginStatus();
+            this.currentImageData = null;
+            this.nextId = this.getNextId();
+            this.init();
+        }
 
-        // Admin panel functionality with Supabase
-        class AdminPanel {
-            constructor() {
-                this.products = [];
-                this.isLoggedIn = this.checkLoginStatus();
-                this.currentImageData = null;
-                this.init();
-            }
-
-            async init() {
-                this.setupLogin();
-                this.setupProductForm();
-                this.setupLogout();
-                this.setupWhatsAppConfig();
-                this.setupImageUpload();
-                if (this.isLoggedIn) {
-                    this.showAdminPanel();
-                    await this.loadProducts();
-                    await this.loadWhatsAppNumber();
-                }
-            }
-
-            async loadProducts() {
-                try {
-                    const { data, error } = await supabase
-                        .from('products')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-
-                    if (error) throw error;
-                    
-                    this.products = data || [];
-                    this.displayAdminProducts();
-                } catch (error) {
-                    console.error('Error loading products:', error);
-                    this.showNotification('Error loading products', 'error');
-                }
-            }
-
-            async loadWhatsAppNumber() {
-                try {
-                    const { data, error } = await supabase
-                        .from('settings')
-                        .select('value')
-                        .eq('key', 'whatsapp_number')
-                        .single();
-
-                    if (data) {
-                        const whatsappInput = document.getElementById('whatsapp-number');
-                        if (whatsappInput) {
-                            whatsappInput.value = data.value;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error loading WhatsApp number:', error);
-                }
-            }
-
-            checkLoginStatus() {
-                return localStorage.getItem('adminLoggedIn') === 'true';
-            }
-
-            setLoginStatus(status) {
-                localStorage.setItem('adminLoggedIn', status);
-                this.isLoggedIn = status;
-            }
-
-            setupLogin() {
-                const loginForm = document.getElementById('login-form');
-                if (loginForm) {
-                    loginForm.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        const username = document.getElementById('username').value;
-                        const password = document.getElementById('password').value;
-
-                        if (username === 'admin' && password === 'DavidLawson') {
-                            this.setLoginStatus(true);
-                            this.showAdminPanel();
-                            this.loadProducts();
-                            this.loadWhatsAppNumber();
-                        } else {
-                            alert('Invalid credentials!');
-                        }
-                    });
-                }
-            }
-
-            setupLogout() {
-                const logoutBtn = document.getElementById('logout-btn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        this.setLoginStatus(false);
-                        this.showLoginSection();
-                    });
-                }
-            }
-
-            showAdminPanel() {
-                const loginSection = document.getElementById('login-section');
-                const adminPanel = document.getElementById('admin-panel');
-                if (loginSection) loginSection.style.display = 'none';
-                if (adminPanel) adminPanel.style.display = 'block';
-            }
-
-            showLoginSection() {
-                const loginSection = document.getElementById('login-section');
-                const adminPanel = document.getElementById('admin-panel');
-                if (loginSection) loginSection.style.display = 'flex';
-                if (adminPanel) adminPanel.style.display = 'none';
-                
-                const loginForm = document.getElementById('login-form');
-                if (loginForm) loginForm.reset();
-            }
-
-            setupImageUpload() {
-                const fileInput = document.getElementById('product-image');
-                const uploadContainer = document.getElementById('image-upload-container');
-
-                if (fileInput) {
-                    fileInput.addEventListener('change', (e) => {
-                        this.handleImageUpload(e.target.files[0]);
-                    });
-                }
-
-                if (uploadContainer) {
-                    uploadContainer.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        uploadContainer.classList.add('dragover');
-                    });
-
-                    uploadContainer.addEventListener('dragleave', (e) => {
-                        e.preventDefault();
-                        uploadContainer.classList.remove('dragover');
-                    });
-
-                    uploadContainer.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        uploadContainer.classList.remove('dragover');
-                        const files = e.dataTransfer.files;
-                        if (files.length > 0 && files[0].type.startsWith('image/')) {
-                            this.handleImageUpload(files[0]);
-                        }
-                    });
-                }
-            }
-
-            handleImageUpload(file) {
-                if (!file || !file.type.startsWith('image/')) {
-                    alert('Please select a valid image file');
-                    return;
-                }
-
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Image size should be less than 5MB');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.currentImageData = e.target.result;
-                    this.showImagePreview(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-
-            showImagePreview(imageSrc) {
-                const imagePreview = document.getElementById('image-preview');
-                if (imagePreview) {
-                    imagePreview.innerHTML = `
-                        <img src="${imageSrc}" alt="Product Preview">
-                        <br>
-                        <button type="button" class="remove-image" onclick="adminPanel.removeImage()">
-                            <i class="fas fa-trash"></i> Remove Image
-                        </button>
-                    `;
-                }
-            }
-
-            removeImage() {
-                this.currentImageData = null;
-                const imagePreview = document.getElementById('image-preview');
-                const fileInput = document.getElementById('product-image');
-                
-                if (imagePreview) imagePreview.innerHTML = '';
-                if (fileInput) fileInput.value = '';
-            }
-
-            setupProductForm() {
-                const addProductBtn = document.getElementById('add-product-btn');
-                const productFormElement = document.getElementById('product-form-element');
-                const cancelBtn = document.getElementById('cancel-form');
-
-                if (addProductBtn) {
-                    addProductBtn.addEventListener('click', () => {
-                        this.showProductForm();
-                    });
-                }
-
-                if (cancelBtn) {
-                    cancelBtn.addEventListener('click', () => {
-                        this.hideProductForm();
-                    });
-                }
-
-                if (productFormElement) {
-                    productFormElement.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        this.saveProduct();
-                    });
-                }
-            }
-
-            async setupWhatsAppConfig() {
-                const saveWhatsAppBtn = document.getElementById('save-whatsapp');
-
-                if (saveWhatsAppBtn) {
-                    saveWhatsAppBtn.addEventListener('click', async () => {
-                        const whatsappInput = document.getElementById('whatsapp-number');
-                        const number = whatsappInput.value.trim();
-                        
-                        if (number) {
-                            if (!/^\d{10,15}$/.test(number)) {
-                                alert('Please enter a valid WhatsApp number (10-15 digits, no spaces or special characters)');
-                                return;
-                            }
-
-                            try {
-                                const { error } = await supabase
-                                    .from('settings')
-                                    .upsert({ key: 'whatsapp_number', value: number });
-
-                                if (error) throw error;
-                                
-                                this.showNotification('WhatsApp number saved successfully!');
-                            } catch (error) {
-                                console.error('Error saving WhatsApp number:', error);
-                                this.showNotification('Error saving WhatsApp number', 'error');
-                            }
-                        } else {
-                            alert('Please enter a WhatsApp number');
-                        }
-                    });
-                }
-            }
-
-            showProductForm(product = null) {
-                const productForm = document.getElementById('product-form');
-                const formTitle = document.getElementById('form-title');
-                
-                if (productForm) productForm.style.display = 'block';
-                
-                if (product) {
-                    if (formTitle) formTitle.textContent = 'Edit Product';
-                    this.populateForm(product);
-                } else {
-                    if (formTitle) formTitle.textContent = 'Add New Product';
-                    this.clearForm();
-                }
-            }
-
-            hideProductForm() {
-                const productForm = document.getElementById('product-form');
-                if (productForm) productForm.style.display = 'none';
-                this.clearForm();
-            }
-
-            populateForm(product) {
-                document.getElementById('product-id').value = product.id;
-                document.getElementById('product-name').value = product.name;
-                document.getElementById('product-brand').value = product.brand;
-                document.getElementById('product-price').value = product.price;
-                document.getElementById('product-description').value = product.description;
-                document.getElementById('product-specs').value = product.specs ? product.specs.join('\n') : '';
-                
-                if (product.image) {
-                    this.currentImageData = product.image;
-                    this.showImagePreview(product.image);
-                }
-            }
-
-            clearForm() {
-                document.getElementById('product-form-element').reset();
-                document.getElementById('product-id').value = '';
-                this.removeImage();
-            }
-
-            async saveProduct() {
-                const submitBtn = document.querySelector('#product-form-element button[type="submit"]');
-                const btnText = submitBtn.querySelector('.btn-text');
-                const loading = submitBtn.querySelector('.loading');
-                
-                // Show loading state
-                btnText.style.display = 'none';
-                loading.style.display = 'inline-block';
-                submitBtn.disabled = true;
-
-                try {
-                    const id = document.getElementById('product-id').value;
-                    const name = document.getElementById('product-name').value;
-                    const brand = document.getElementById('product-brand').value;
-                    const price = parseFloat(document.getElementById('product-price').value);
-                    const description = document.getElementById('product-description').value;
-                    const specsText = document.getElementById('product-specs').value;
-                    const specs = specsText.split('\n').filter(spec => spec.trim());
-
-                    if (!this.currentImageData) {
-                        alert('Please select an image for the product');
-                        return;
-                    }
-
-                    const productData = {
-                        name,
-                        brand,
-                        price,
-                        image: this.currentImageData,
-                        description,
-                        specs
-                    };
-
-                    let result;
-                    if (id) {
-                        // Update existing product
-                        result = await supabase
-                            .from('products')
-                            .update(productData)
-                            .eq('id', id);
-                    } else {
-                        // Insert new product
-                        result = await supabase
-                            .from('products')
-                            .insert([productData]);
-                    }
-
-                    if (result.error) throw result.error;
-
-                    await this.loadProducts();
-                    this.hideProductForm();
-                    this.showNotification('Product saved successfully!');
-
-                } catch (error) {
-                    console.error('Error saving product:', error);
-                    this.showNotification('Error saving product', 'error');
-                } finally {
-                    // Hide loading state
-                    btnText.style.display = 'inline';
-                    loading.style.display = 'none';
-                    submitBtn.disabled = false;
-                }
-            }
-
-            displayAdminProducts() {
-                const productsList = document.getElementById('admin-products-list');
-                if (!productsList) return;
-
-                productsList.innerHTML = '';
-
-                if (this.products.length === 0) {
-                    productsList.innerHTML = '<p>No products found. Add some products to get started!</p>';
-                    return;
-                }
-
-                this.products.forEach(product => {
-                    const productItem = document.createElement('div');
-                    productItem.className = 'admin-product-item';
-                    
-                    const imageContent = product.image && product.image.startsWith('data:image/') 
-                        ? `<img src="${product.image}" alt="${product.name}">`
-                        : product.image || '💻';
-                    
-                    productItem.innerHTML = `
-                        <div class="admin-product-image">${imageContent}</div>
-                        <div class="admin-product-info">
-                            <h4>${product.name}</h4>
-                            <p>${product.brand} - #${product.price.toFixed(2)}</p>
-                            <p>${product.description}</p>
-                        </div>
-                        <div class="admin-product-actions">
-                            <button class="btn btn-secondary" onclick="adminPanel.editProduct(${product.id})">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="btn btn-danger" onclick="adminPanel.deleteProduct(${product.id})">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    `;
-                    productsList.appendChild(productItem);
-                });
-            }
-
-            editProduct(productId) {
-                const product = this.products.find(p => p.id === productId);
-                if (product) {
-                    this.showProductForm(product);
-                }
-            }
-
-            async deleteProduct(productId) {
-                if (confirm('Are you sure you want to delete this product?')) {
-                    try {
-                        const { error } = await supabase
-                            .from('products')
-                            .delete()
-                            .eq('id', productId);
-
-                        if (error) throw error;
-
-                        await this.loadProducts();
-                        this.showNotification('Product deleted successfully!');
-                    } catch (error) {
-                        console.error('Error deleting product:', error);
-                        this.showNotification('Error deleting product', 'error');
-                    }
-                }
-            }
-
-            showNotification(message, type = 'success') {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type === 'error' ? 'error' : ''}`;
-                notification.textContent = message;
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.classList.add('show');
-                }, 100);
-
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
-                }, 3000);
+        init() {
+            this.setupLogin();
+            this.setupProductForm();
+            this.setupLogout();
+            this.setupWhatsAppConfig();
+            this.setupImageUpload();
+            if (this.isLoggedIn) {
+                this.showAdminPanel();
+                this.displayAdminProducts();
+                this.loadWhatsAppNumber();
             }
         }
 
-        // Initialize admin panel
-        let adminPanel;
-        document.addEventListener('DOMContentLoaded', () => {
-            adminPanel = new AdminPanel();
-        });
-    </script>
-</body>
-</html>
+        loadProducts() {
+            const products = localStorage.getItem('laptopProducts');
+            return products ? JSON.parse(products) : [];
+        }
+
+        saveProducts() {
+            localStorage.setItem('laptopProducts', JSON.stringify(this.products));
+            // Trigger storage event for other pages
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'laptopProducts',
+                newValue: JSON.stringify(this.products)
+            }));
+        }
+
+        getNextId() {
+            if (this.products.length === 0) return 1;
+            return Math.max(...this.products.map(p => p.id)) + 1;
+        }
+
+        loadWhatsAppNumber() {
+            const number = localStorage.getItem('whatsapp_number');
+            if (number) {
+                const whatsappInput = document.getElementById('whatsapp-number');
+                if (whatsappInput) {
+                    whatsappInput.value = number;
+                }
+            }
+        }
+
+        checkLoginStatus() {
+            return localStorage.getItem('adminLoggedIn') === 'true';
+        }
+
+        setLoginStatus(status) {
+            localStorage.setItem('adminLoggedIn', status);
+            this.isLoggedIn = status;
+        }
+
+        setupLogin() {
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+
+                    if (username === 'admin' && password === 'admin123') {
+                        this.setLoginStatus(true);
+                        this.showAdminPanel();
+                        this.displayAdminProducts();
+                        this.loadWhatsAppNumber();
+                    } else {
+                        alert('Invalid credentials!');
+                    }
+                });
+            }
+        }
+
+        setupLogout() {
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.setLoginStatus(false);
+                    this.showLoginSection();
+                });
+            }
+        }
+
+        showAdminPanel() {
+            const loginSection = document.getElementById('login-section');
+            const adminPanel = document.getElementById('admin-panel');
+            if (loginSection) loginSection.style.display = 'none';
+            if (adminPanel) adminPanel.style.display = 'block';
+        }
+
+        showLoginSection() {
+            const loginSection = document.getElementById('login-section');
+            const adminPanel = document.getElementById('admin-panel');
+            if (loginSection) loginSection.style.display = 'flex';
+            if (adminPanel) adminPanel.style.display = 'none';
+            
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) loginForm.reset();
+        }
+
+        setupImageUpload() {
+            const fileInput = document.getElementById('product-image');
+            const uploadContainer = document.getElementById('image-upload-container');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    this.handleImageUpload(e.target.files[0]);
+                });
+            }
+
+            if (uploadContainer) {
+                uploadContainer.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadContainer.style.borderColor = '#3498db';
+                });
+
+                uploadContainer.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    uploadContainer.style.borderColor = '#ddd';
+                });
+
+                uploadContainer.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadContainer.style.borderColor = '#ddd';
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].type.startsWith('image/')) {
+                        this.handleImageUpload(files[0]);
+                    }
+                });
+            }
+        }
+
+        handleImageUpload(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Please select a valid image file');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.currentImageData = e.target.result;
+                this.showImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        showImagePreview(imageSrc) {
+            const imagePreview = document.getElementById('image-preview');
+            if (imagePreview) {
+                imagePreview.innerHTML = `
+                    <img src="${imageSrc}" alt="Product Preview">
+                    <br>
+                    <button type="button" class="btn btn-danger" onclick="adminPanel.removeImage()" style="margin-top: 10px;">
+                        <i class="fas fa-trash"></i> Remove Image
+                    </button>
+                `;
+            }
+        }
+
+        removeImage() {
+            this.currentImageData = null;
+            const imagePreview = document.getElementById('image-preview');
+            const fileInput = document.getElementById('product-image');
+            
+            if (imagePreview) imagePreview.innerHTML = '';
+            if (fileInput) fileInput.value = '';
+        }
+
+        setupProductForm() {
+            const addProductBtn = document.getElementById('add-product-btn');
+            const productFormElement = document.getElementById('product-form-element');
+            const cancelBtn = document.getElementById('cancel-form');
+
+            if (addProductBtn) {
+                addProductBtn.addEventListener('click', () => {
+                    this.showProductForm();
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    this.hideProductForm();
+                });
+            }
+
+            if (productFormElement) {
+                productFormElement.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveProduct();
+                });
+            }
+        }
+
+        setupWhatsAppConfig() {
+            const saveWhatsAppBtn = document.getElementById('save-whatsapp');
+
+            if (saveWhatsAppBtn) {
+                saveWhatsAppBtn.addEventListener('click', () => {
+                    const whatsappInput = document.getElementById('whatsapp-number');
+                    const number = whatsappInput.value.trim();
+                    
+                    if (number) {
+                        if (!/^\d{10,15}$/.test(number)) {
+                            alert('Please enter a valid WhatsApp number (10-15 digits, no spaces or special characters)');
+                            return;
+                        }
+
+                        localStorage.setItem('whatsapp_number', number);
+                        this.showNotification
