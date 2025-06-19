@@ -293,7 +293,7 @@
                         <i class="fas fa-shopping-cart"></i>
                         Cart (<span id="cart-count">0</span>)
                     </a></li>
-                    <li><a href="admin.html" class="nav-link">Admin</a></li>
+                    <li><a href="admin-panel.html" class="nav-link">Admin</a></li>
                 </ul>
             </div>
         </nav>
@@ -338,216 +338,246 @@
     </main>
 
     <script>
-        // Simple, fast shopping cart using localStorage
-        class ShoppingCart {
-            constructor() {
-                this.cart = this.loadCart();
-                this.whatsappNumber = localStorage.getItem('whatsapp_number') || '1234567890';
-                this.init();
-            }
+    // Shared database configuration
+    const DB_CONFIG = {
+        // You'll need to create a free account at jsonbin.io and get these
+        BIN_ID: '6853e8a18960c979a5acbf7d', // Replace with your JSONBin ID
+        API_KEY: '$2a$10$cv7nlzyC.riYJ6wqTQdWLeM5kw0eYApifuJtFY6F1TnOD7Za73HKy', // Replace with your JSONBin API key
+        BASE_URL: 'https://api.jsonbin.io/v3/b/6853e8a18960c979a5acbf7d'
+    };
 
-            init() {
-                this.displayCart();
-                this.setupCheckout();
-                this.updateCartCount();
-            }
+    // Shopping cart with shared database
+    class ShoppingCart {
+        constructor() {
+            this.cart = this.loadCart();
+            this.whatsappNumber = '1234567890';
+            this.products = [];
+            this.init();
+        }
 
-            loadCart() {
-                const cart = localStorage.getItem('laptopCart');
-                return cart ? JSON.parse(cart) : [];
-            }
+        async init() {
+            await this.loadSettings();
+            this.displayCart();
+            this.setupCheckout();
+            this.updateCartCount();
+        }
 
-            saveCart() {
-                localStorage.setItem('laptopCart', JSON.stringify(this.cart));
-                this.updateCartCount();
-                // Trigger storage event for other pages
-                window.dispatchEvent(new StorageEvent('storage', {
-                    key: 'laptopCart',
-                    newValue: JSON.stringify(this.cart)
-                }));
-            }
-
-            displayCart() {
-                const cartItems = document.getElementById('cart-items');
-                const cartContent = document.getElementById('cart-content');
-                const emptyCart = document.getElementById('empty-cart');
-
-                if (this.cart.length === 0) {
-                    if (cartContent) cartContent.style.display = 'none';
-                    if (emptyCart) emptyCart.style.display = 'block';
-                    return;
-                }
-
-                if (cartContent) cartContent.style.display = 'grid';
-                if (emptyCart) emptyCart.style.display = 'none';
-
-                if (!cartItems) return;
-
-                cartItems.innerHTML = '';
-
-                this.cart.forEach(item => {
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    
-                    // Handle image display - check if it's base64 data or emoji/text
-                    const imageContent = item.image && item.image.startsWith('data:image/') 
-                        ? `<img src="${item.image}" alt="${item.name}">`
-                        : item.image || '💻';
-                    
-                    cartItem.innerHTML = `
-                        <div class="cart-item-image">${imageContent}</div>
-                        <div class="cart-item-info">
-                            <h4 class="cart-item-name">${item.name}</h4>
-                            <p class="cart-item-brand">${item.brand}</p>
-                            <p class="cart-item-price">$${item.price.toFixed(2)}</p>
-                            <div class="quantity-controls">
-                                <button class="quantity-btn" onclick="shoppingCart.updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
-                                <input type="number" class="quantity-input" value="${item.quantity}" min="1" 
-                                       onchange="shoppingCart.updateQuantity(${item.id}, this.value)">
-                                <button class="quantity-btn" onclick="shoppingCart.updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                            </div>
-                            <p class="item-total">Total: $${(item.price * item.quantity).toFixed(2)}</p>
-                        </div>
-                        <button class="btn btn-danger" onclick="shoppingCart.removeItem(${item.id})">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    `;
-                    cartItems.appendChild(cartItem);
+        async loadSettings() {
+            try {
+                const response = await fetch(`${DB_CONFIG.BASE_URL}/${DB_CONFIG.BIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': DB_CONFIG.API_KEY
+                    }
                 });
 
-                this.updateSummary();
-            }
-
-            updateQuantity(itemId, newQuantity) {
-                newQuantity = parseInt(newQuantity);
-                if (newQuantity < 1) {
-                    this.removeItem(itemId);
-                    return;
+                if (response.ok) {
+                    const data = await response.json();
+                    this.whatsappNumber = data.record.whatsapp_number || '1234567890';
+                    this.products = data.record.products || [];
+                } else {
+                    console.log('Could not load settings from database');
                 }
-
-                const item = this.cart.find(item => item.id === itemId);
-                if (item) {
-                    item.quantity = newQuantity;
-                    this.saveCart();
-                    this.displayCart();
-                }
-            }
-
-            removeItem(itemId) {
-                this.cart = this.cart.filter(item => item.id !== itemId);
-                this.saveCart();
-                this.displayCart();
-            }
-
-            updateSummary() {
-                const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const tax = subtotal * 0.085; // 8.5% tax
-                const total = subtotal + tax;
-
-                const subtotalElement = document.getElementById('subtotal');
-                const taxElement = document.getElementById('tax');
-                const totalElement = document.getElementById('total');
-
-                if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-                if (taxElement) taxElement.textContent = `$${tax.toFixed(2)}`;
-                if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
-            }
-
-            updateCartCount() {
-                const cartCount = document.getElementById('cart-count');
-                if (cartCount) {
-                    const totalItems = this.cart.reduce((sum, item) => sum + item.quantity, 0);
-                    cartCount.textContent = totalItems;
-                }
-            }
-
-            setupCheckout() {
-                const checkoutBtn = document.getElementById('checkout-btn');
-                if (checkoutBtn) {
-                    checkoutBtn.addEventListener('click', () => {
-                        this.checkout();
-                    });
-                }
-
-                const whatsappBtn = document.getElementById('whatsapp-order-btn');
-                if (whatsappBtn) {
-                    whatsappBtn.addEventListener('click', () => {
-                        this.orderViaWhatsApp();
-                    });
-                }
-            }
-
-            orderViaWhatsApp() {
-                if (this.cart.length === 0) {
-                    alert('Your cart is empty!');
-                    return;
-                }
-
-                const orderMessage = this.generateOrderMessage();
-                const whatsappUrl = `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(orderMessage)}`;
-                
-                if (confirm('This will open WhatsApp with your order details. Continue?')) {
-                    window.open(whatsappUrl, '_blank');
-                }
-            }
-
-            generateOrderMessage() {
-                const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const tax = subtotal * 0.085;
-                const total = subtotal + tax;
-
-                let message = "🛒 *New Laptop Order from RealTech*\n\n";
-                message += "📋 *Order Details:*\n";
-                
-                this.cart.forEach((item, index) => {
-                    message += `${index + 1}. *${item.name}*\n`;
-                    message += `   Brand: ${item.brand}\n`;
-                    message += `   Price: $${item.price.toFixed(2)}\n`;
-                    message += `   Quantity: ${item.quantity}\n`;
-                    message += `   Subtotal: $${(item.price * item.quantity).toFixed(2)}\n\n`;
-                });
-
-                message += "💰 *Order Summary:*\n";
-                message += `Subtotal: $${subtotal.toFixed(2)}\n`;
-                message += `Tax (8.5%): $${tax.toFixed(2)}\n`;
-                message += `*Total: $${total.toFixed(2)}*\n\n`;
-                
-                message += "📞 Please confirm this order and provide delivery details.\n";
-                message += "Thank you for choosing RealTech! 🚀";
-
-                return message;
-            }
-
-            checkout() {
-                if (this.cart.length === 0) {
-                    alert('Your cart is empty!');
-                    return;
-                }
-
-                const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.085;
-                
-                if (confirm(`Complete your order for $${total.toFixed(2)}?`)) {
-                    alert('Thank you for your order! Your laptops will be shipped soon.');
-                    this.cart = [];
-                    this.saveCart();
-                    this.displayCart();
-                }
+            } catch (error) {
+                console.log('Error loading settings:', error);
             }
         }
 
-        // Initialize shopping cart
-        let shoppingCart;
-        document.addEventListener('DOMContentLoaded', () => {
-            shoppingCart = new ShoppingCart();
-        });
+        loadCart() {
+            const cart = localStorage.getItem('laptopCart');
+            return cart ? JSON.parse(cart) : [];
+        }
 
-        // Listen for storage changes to update cart
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'laptopCart') {
-                shoppingCart.cart = shoppingCart.loadCart();
-                shoppingCart.displayCart();
+        saveCart() {
+            localStorage.setItem('laptopCart', JSON.stringify(this.cart));
+            this.updateCartCount();
+            // Trigger storage event for other pages
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'laptopCart',
+                newValue: JSON.stringify(this.cart)
+            }));
+        }
+
+        displayCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartContent = document.getElementById('cart-content');
+            const emptyCart = document.getElementById('empty-cart');
+
+            if (this.cart.length === 0) {
+                if (cartContent) cartContent.style.display = 'none';
+                if (emptyCart) emptyCart.style.display = 'block';
+                return;
             }
-        });
-    </script>
+
+            if (cartContent) cartContent.style.display = 'grid';
+            if (emptyCart) emptyCart.style.display = 'none';
+
+            if (!cartItems) return;
+
+            cartItems.innerHTML = '';
+
+            this.cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                
+                // Handle image display - check if it's base64 data or emoji/text
+                const imageContent = item.image && item.image.startsWith('data:image/') 
+                    ? `<img src="${item.image}" alt="${item.name}">`
+                    : item.image || '💻';
+                
+                cartItem.innerHTML = `
+                    <div class="cart-item-image">${imageContent}</div>
+                    <div class="cart-item-info">
+                        <h4 class="cart-item-name">${item.name}</h4>
+                        <p class="cart-item-brand">${item.brand}</p>
+                        <p class="cart-item-price">$${item.price.toFixed(2)}</p>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="shoppingCart.updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                            <input type="number" class="quantity-input" value="${item.quantity}" min="1" 
+                                   onchange="shoppingCart.updateQuantity(${item.id}, this.value)">
+                            <button class="quantity-btn" onclick="shoppingCart.updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                        </div>
+                        <p class="item-total">Total: $${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                    <button class="btn btn-danger" onclick="shoppingCart.removeItem(${item.id})">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+
+            this.updateSummary();
+        }
+
+        updateQuantity(itemId, newQuantity) {
+            newQuantity = parseInt(newQuantity);
+            if (newQuantity < 1) {
+                this.removeItem(itemId);
+                return;
+            }
+
+            const item = this.cart.find(item => item.id === itemId);
+            if (item) {
+                item.quantity = newQuantity;
+                this.saveCart();
+                this.displayCart();
+            }
+        }
+
+        removeItem(itemId) {
+            this.cart = this.cart.filter(item => item.id !== itemId);
+            this.saveCart();
+            this.displayCart();
+        }
+
+        updateSummary() {
+            const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.085; // 8.5% tax
+            const total = subtotal + tax;
+
+            const subtotalElement = document.getElementById('subtotal');
+            const taxElement = document.getElementById('tax');
+            const totalElement = document.getElementById('total');
+
+            if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+            if (taxElement) taxElement.textContent = `$${tax.toFixed(2)}`;
+            if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
+        }
+
+        updateCartCount() {
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                const totalItems = this.cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCount.textContent = totalItems;
+            }
+        }
+
+        setupCheckout() {
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', () => {
+                    this.checkout();
+                });
+            }
+
+            const whatsappBtn = document.getElementById('whatsapp-order-btn');
+            if (whatsappBtn) {
+                whatsappBtn.addEventListener('click', () => {
+                    this.orderViaWhatsApp();
+                });
+            }
+        }
+
+        orderViaWhatsApp() {
+            if (this.cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const orderMessage = this.generateOrderMessage();
+            const whatsappUrl = `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(orderMessage)}`;
+            
+            if (confirm('This will open WhatsApp with your order details. Continue?')) {
+                window.open(whatsappUrl, '_blank');
+            }
+        }
+
+        generateOrderMessage() {
+            const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.085;
+            const total = subtotal + tax;
+
+            let message = "🛒 *New Laptop Order from RealTech*\n\n";
+            message += "📋 *Order Details:*\n";
+            
+            this.cart.forEach((item, index) => {
+                message += `${index + 1}. *${item.name}*\n`;
+                message += `   Brand: ${item.brand}\n`;
+                message += `   Price: $${item.price.toFixed(2)}\n`;
+                message += `   Quantity: ${item.quantity}\n`;
+                message += `   Subtotal: $${(item.price * item.quantity).toFixed(2)}\n\n`;
+            });
+
+            message += "💰 *Order Summary:*\n";
+            message += `Subtotal: $${subtotal.toFixed(2)}\n`;
+            message += `Tax (8.5%): $${tax.toFixed(2)}\n`;
+            message += `*Total: $${total.toFixed(2)}*\n\n`;
+            
+            message += "📞 Please confirm this order and provide delivery details.\n";
+            message += "Thank you for choosing RealTech! 🚀";
+
+            return message;
+        }
+
+        checkout() {
+            if (this.cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.085;
+            
+            if (confirm(`Complete your order for $${total.toFixed(2)}?`)) {
+                alert('Thank you for your order! Your laptops will be shipped soon.');
+                this.cart = [];
+                this.saveCart();
+                this.displayCart();
+            }
+        }
+    }
+
+    // Initialize shopping cart
+    let shoppingCart;
+    document.addEventListener('DOMContentLoaded', () => {
+        shoppingCart = new ShoppingCart();
+    });
+
+    // Listen for storage changes to update cart
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'laptopCart') {
+            shoppingCart.cart = shoppingCart.loadCart();
+            shoppingCart.displayCart();
+        }
+    });
+</script>
 </body>
 </html>
